@@ -1,1 +1,1 @@
-Just the basic POST and GET API
+basic POST/GET/retrieve API with local db
