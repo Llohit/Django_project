@@ -1,0 +1,13 @@
+settings.py
+-It consists of all the config info that Django requires wrt the application built
+
+wsgi (Web Server Gateway Interface)
+-This is the medium thru which the application communicates with server requests.
+-It handles standard HTTP requests and responses from-to application.
+-The wsgi server receives the request and passes it to app, the app processes the request
+and sends the respnse back to the server, the server then sends the resp to the client(browser).
+-It only handles sync process (One request at a time).
+
+asgi (Async Server Gateway Interface)
+- Also handles async process (Multiple req at a time)
+- Rest all same as wsgi
