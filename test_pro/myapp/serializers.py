@@ -17,7 +17,7 @@ from rest_framework import serializers
 #         }
 
 class SampleSerializer(serializers.Serializer):
-    id= serializers.IntegerField()
+    id= serializers.CharField(required=False)
     type= serializers.CharField()
     description= serializers.CharField()
     account= serializers.IntegerField()
