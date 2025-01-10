@@ -34,9 +34,16 @@ class Sample(ViewSet):
     def retrieve(self,request,pk):
         account_id = int(pk)
         if account_id not in self.account_details:
-            return Response({f"Details for account id:{account_id} is not found"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({f"Account id:{account_id} is not found"}, status=status.HTTP_403_FORBIDDEN)
         account_details = self.account_details[account_id]
         serializer = self.serializer_class(account_details)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+    def delete(self,pk):
+        account_id = int(pk)
+        if account_id not in self.account_details:
+            return Response({f"Account id:{account_id} is not found"}, status=status.HTTP_403_FORBIDDEN)
+        self.account_details.pop(account_id)
+        return Response(status= status.HTTP_204_NO_CONTENT)
 
 # Create your views here.
