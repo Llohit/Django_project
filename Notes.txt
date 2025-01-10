@@ -1,3 +1,9 @@
+To create a new project:
+-create a virtual env using cmd "python -m venv venv"
+-install all the dependencies inside the venv environment example
+pip install django
+pip install djangorestframework
+
 settings.py
 -It consists of all the config info that Django requires wrt the application built
 
@@ -17,3 +23,4 @@ python manage.py makemigrations
 
 python manage.py migrate
 -does the actual changes like creating/updating table
+
