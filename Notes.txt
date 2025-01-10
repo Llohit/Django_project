@@ -11,3 +11,9 @@ and sends the respnse back to the server, the server then sends the resp to the 
 asgi (Async Server Gateway Interface)
 - Also handles async process (Multiple req at a time)
 - Rest all same as wsgi
+
+python manage.py makemigrations
+-creates an migration file to describe changes
+
+python manage.py migrate
+-does the actual changes like creating/updating table
