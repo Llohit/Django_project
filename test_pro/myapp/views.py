@@ -22,7 +22,7 @@ class Sample(ViewSet):
         #This is required as request has data from external src, which needs to be validated b4 storing in db.
         serializer = self.serializer_class(data= request.data)
 
-        #validations will occur
+        # Validate the data provided by user, it will automatically raise exception if deserialization fails.
         serializer.is_valid(raise_exception=True) #Raise exception and return 400 bad request by DRF
 
         data=serializer.validated_data
@@ -71,7 +71,7 @@ class Sample(ViewSet):
             #User might only provide data which is required to modify, hence partial is accepted
             serializer = self.serializer_class(data=new_data, partial=True)
 
-            #Validate the data provided by user
+            #Validate the data provided by user, it will automatically raise exception if deserialization fails.
             serializer.is_valid(raise_exception=True)
 
             print(serializer.validated_data)
