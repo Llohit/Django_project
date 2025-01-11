@@ -18,6 +18,40 @@ from rest_framework import serializers
 
 class SampleSerializer(serializers.Serializer):
     id= serializers.CharField(required=False)
-    type= serializers.CharField()
-    description= serializers.CharField()
-    account= serializers.IntegerField()
+    type= serializers.CharField(required=True)
+    description= serializers.CharField(required=True)
+    account= serializers.IntegerField(required=True)
+
+    def to_internal_value(self, data):
+        allowed_fields = {'id','type','description','account'}
+        extra_fields = set(data.keys()) - allowed_fields
+        arr_format = ", ".join(extra_fields)
+        if extra_fields:
+            raise serializers.ValidationError({"Extra fields provided": f"{arr_format}"})
+        if "type" in data and not isinstance(data['type'], str):
+            raise serializers.ValidationError({"type": "Type must be a string"})
+
+        if "description" in data and not isinstance(data['description'], str):
+            raise serializers.ValidationError({"description": "Description must be a string"})
+
+        if "account" in data and not isinstance(data['account'], int):
+            raise serializers.ValidationError({"account": "Account must be an integer"})
+
+        #Call parents class to_internal_value to ensure the normal workflow of parent class also happens
+        #The normal workflow of parent class to_internal_value is responsible for converting incoming data (usually the request body in the form of JSON) into internal Python objects that can be processed later
+        #So we ensure our checks and validation happens along with normal conversion from parent class also takes place
+        #So whenever to_internal_value is called internally, first this function is called and then parent class to_internal_value
+        return super().to_internal_value(data)
+
+    #This is called after DRF deserializes the data and we want to perform any extra valdn
+    def validate_type(self, value):
+        if(len(value) < 2):
+            raise serializers.ValidationError({"type": "Type must be at least 2 characters"})
+        return value
+
+    #This is called after DRF deserializes the data and we want to perform any extra valdn
+    def validate_description(self, value):
+        return value
+
+
+

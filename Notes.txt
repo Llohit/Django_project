@@ -24,3 +24,28 @@ python manage.py makemigrations
 python manage.py migrate
 -does the actual changes like creating/updating table
 
+In serializer many=True is used when there are list of objects which needs to be
+serialized example:
+
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "email": "johndoe@example.com"
+    },
+    {
+        "id": 2,
+        "name": "Jane Doe",
+        "email": "janedoe@example.com"
+    }
+]
+
+When you have single object to serialize don't use many=True
+e.g
+    {
+        "id": 1,
+        "name": "John Doe",
+        "email": "johndoe@example.com"
+    }
+
+In serializer partial=True is used when we want to accept partial data from user.
