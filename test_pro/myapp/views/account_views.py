@@ -9,6 +9,10 @@ class Sample(ViewSet):
     serializer_class= SampleSerializer
 
     def list(self,request):
+        #Check for user_id
+        query_params = request.query_params.dict()
+        if "user_id" not in query_params:
+            return Response("User id not passed as query parameters!", status=status.HTTP_403_FORBIDDEN)
         #GET all the list from db
         account_data = Account.objects.all()
 
@@ -17,6 +21,10 @@ class Sample(ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self,request):
+        # Check for user_id
+        query_params = request.query_params.dict()
+        if "user_id" not in query_params:
+            return Response("User id not passed as query parameters!", status=status.HTTP_403_FORBIDDEN)
         #passing with data keyword, The serializer is used for deserialization (validating and converting incoming data into a model object)
         #This is required as request has data from external src, which needs to be validated b4 storing in db.
         serializer = self.serializer_class(data= request.data)
@@ -34,6 +42,10 @@ class Sample(ViewSet):
         return Response(data,status=status.HTTP_201_CREATED)
 
     def retrieve(self,request,pk):
+        # Check for user_id
+        query_params = request.query_params.dict()
+        if "user_id" not in query_params:
+            return Response("User id not passed as query parameters!", status=status.HTTP_403_FORBIDDEN)
         try:
             account_uid = uuid.UUID(pk)
         except ValueError:
@@ -47,6 +59,10 @@ class Sample(ViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
     def destroy(self, request, pk):
+        # Check for user_id
+        query_params = request.query_params.dict()
+        if "user_id" not in query_params:
+            return Response("User id not passed as query parameters!", status=status.HTTP_403_FORBIDDEN)
         try:
             account_uid = uuid.UUID(pk)
         except ValueError:
@@ -59,6 +75,10 @@ class Sample(ViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
     def patch(self, request, pk):
+        # Check for user_id
+        query_params = request.query_params.dict()
+        if "user_id" not in query_params:
+            return Response("User id not passed as query parameters!", status=status.HTTP_403_FORBIDDEN)
         try:
             account_uid = uuid.UUID(pk)
         except ValueError:

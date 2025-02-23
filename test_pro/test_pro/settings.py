@@ -41,9 +41,9 @@ INSTALLED_APPS = [
     'myapp',
 ]
 
-# REST_FRAMEWORK = {
-#     "DEFAULT_AUTHENTICATION_CLASSES": ("test_pro.myapp.jwt_authentication.JWTAuthentication",),
-# }
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ("myapp.jwt_authentication.JWTAuthentication",),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
