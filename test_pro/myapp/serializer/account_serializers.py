@@ -20,7 +20,8 @@ class SampleSerializer(serializers.Serializer):
     id= serializers.CharField(required=False)
     type= serializers.CharField(required=True)
     description= serializers.CharField(required=True)
-    account= serializers.IntegerField(required=True)
+    account= serializers.IntegerField(required=False)
+    user= serializers.IntegerField(required=False)
 
     # def validate_account(self, value):
     #     """
@@ -35,7 +36,7 @@ class SampleSerializer(serializers.Serializer):
     #     return value
 
     def to_internal_value(self, data):
-        allowed_fields = {'id','type','description','account'}
+        allowed_fields = {'id','type','description','account','user'}
         extra_fields = set(data.keys()) - allowed_fields
         arr_format = ", ".join(extra_fields)
         if extra_fields:
@@ -48,6 +49,9 @@ class SampleSerializer(serializers.Serializer):
 
         if "account" in data and not isinstance(data['account'], int):
             raise serializers.ValidationError({"account": "Account must be an integer"})
+
+        if "user" in data and not isinstance(data['user'], int):
+            raise serializers.ValidationError({"user": "Account must be an integer"})
 
         #Call parents class to_internal_value to ensure the normal workflow of parent class also happens
         #The normal workflow of parent class to_internal_value is responsible for converting incoming data (usually the request body in the form of JSON) into internal Python objects that can be processed later

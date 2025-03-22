@@ -2,8 +2,10 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from myapp.serializer.account_serializers import SampleSerializer
 from rest_framework import status
-from myapp.models import Account
+from myapp.models import Account,User
 import uuid
+import random
+
 
 class Sample(ViewSet):
     serializer_class= SampleSerializer
@@ -13,8 +15,12 @@ class Sample(ViewSet):
         query_params = request.query_params.dict()
         if "user_id" not in query_params:
             return Response("User id not passed as query parameters!", status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(user=query_params["user_id"])
+        except User.DoesNotExist:
+            return Response(data="User does not exists!",status=status.HTTP_403_FORBIDDEN)
         #GET all the list from db
-        account_data = Account.objects.all()
+        account_data = Account.objects.filter(user=query_params["user_id"])
 
         #to serialize the model instance into a format like JSON, no validation happening here
         serializer = self.serializer_class(account_data, many=True)
@@ -25,6 +31,10 @@ class Sample(ViewSet):
         query_params = request.query_params.dict()
         if "user_id" not in query_params:
             return Response("User id not passed as query parameters!", status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(user=query_params["user_id"])
+        except User.DoesNotExist:
+            return Response(data="User does not exists!",status=status.HTTP_403_FORBIDDEN)
         #passing with data keyword, The serializer is used for deserialization (validating and converting incoming data into a model object)
         #This is required as request has data from external src, which needs to be validated b4 storing in db.
         serializer = self.serializer_class(data= request.data)
@@ -37,6 +47,9 @@ class Sample(ViewSet):
             return Response({f"Unexpected field id provided!"}, status=status.HTTP_400_BAD_REQUEST)
         unique_uuid=uuid.uuid4()
         data['id']=unique_uuid
+        data['user']=int(query_params["user_id"])
+        account_id = random.randint(1000, 9999)
+        data['account'] = account_id
         #Store in db
         Account.objects.create(**data)
         return Response(data,status=status.HTTP_201_CREATED)
@@ -52,6 +65,8 @@ class Sample(ViewSet):
             raise ValueError("Key is not in UUID format")
         try:
             account_details = Account.objects.get(pk=account_uid)
+            if account_details.user != query_params["user_id"]:
+                return Response(data="Account Id does not exists for the user",status=status.HTTP_403_FORBIDDEN)
             #to serialize the model instance into a format like JSON, no validation happening here
             serializer = self.serializer_class(account_details)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -69,6 +84,8 @@ class Sample(ViewSet):
             raise ValueError("Key is not in UUID format")
         try:
             account_details = Account.objects.get(pk=account_uid)
+            if account_details.user != query_params["user_id"]:
+                return Response(data="Account Id does not exists for the user",status=status.HTTP_403_FORBIDDEN)
             account_details.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Account.DoesNotExist:
@@ -86,7 +103,8 @@ class Sample(ViewSet):
         try:
             account_details = Account.objects.get(pk=account_uid)
             new_data = request.data
-
+            if account_details.user != query_params["user_id"]:
+                return Response(data="Account Id does not exists for the user",status=status.HTTP_403_FORBIDDEN)
             #User might only provide data which is required to modify, hence partial is accepted
             serializer = self.serializer_class(data=new_data, partial=True)
 
