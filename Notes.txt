@@ -74,3 +74,12 @@ So If Someone has a base64(not encoded) payload and not signature, they can see 
 But cannot modify it to create a token for another payload, because even if another token is created
 with other payload, the signature will be different and back end will catch that saying
 "Signature not match for the payload"(because that payload was assoc with other secret key which is not known)
+
+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
+
+Create django project = django-admin startproject myproject
+Create django app = python manage.py startapp myapp
+add the myapp in the settings.py of myproject
+create an urls.py file in your myapp
+include(direct) the urls.py of your myproject to the myapp
+migrate the models = python manage.py migrate
