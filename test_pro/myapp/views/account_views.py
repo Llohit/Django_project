@@ -5,6 +5,7 @@ from rest_framework import status
 from myapp.models import Account,User
 import uuid
 import random
+import string
 
 
 class Sample(ViewSet):
@@ -50,6 +51,8 @@ class Sample(ViewSet):
         data['user']=int(query_params["user_id"])
         account_id = random.randint(1000, 9999)
         data['account'] = account_id
+        unique_financial_key = ''.join(random.choices(string.ascii_letters,k=2))+''.join(random.choices(string.digits,k=2))
+        data['financial_key'] = unique_financial_key + str(account_id)
         #Store in db
         Account.objects.create(**data)
         return Response(data,status=status.HTTP_201_CREATED)

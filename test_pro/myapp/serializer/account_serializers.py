@@ -22,6 +22,7 @@ class SampleSerializer(serializers.Serializer):
     description= serializers.CharField(required=True)
     account= serializers.IntegerField(required=False)
     user= serializers.IntegerField(required=False)
+    financial_key= serializers.CharField(required=False)
 
     # def validate_account(self, value):
     #     """

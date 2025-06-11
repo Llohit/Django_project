@@ -6,6 +6,7 @@ class Account(models.Model):
     description = models.TextField()
     account = models.IntegerField()
     user = models.IntegerField(null=False)
+    financial_key = models.CharField(null=False,max_length=25)
 
 class User(models.Model):
     user = models.IntegerField(primary_key=True, unique=True)
