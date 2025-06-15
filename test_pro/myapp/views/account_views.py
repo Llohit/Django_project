@@ -68,7 +68,7 @@ class Sample(ViewSet):
             raise ValueError("Key is not in UUID format")
         try:
             account_details = Account.objects.get(pk=account_uid)
-            if account_details.user != query_params["user_id"]:
+            if account_details.user != int(query_params["user_id"]):
                 return Response(data="Account Id does not exists for the user",status=status.HTTP_403_FORBIDDEN)
             #to serialize the model instance into a format like JSON, no validation happening here
             serializer = self.serializer_class(account_details)
@@ -87,7 +87,7 @@ class Sample(ViewSet):
             raise ValueError("Key is not in UUID format")
         try:
             account_details = Account.objects.get(pk=account_uid)
-            if account_details.user != query_params["user_id"]:
+            if account_details.user != int(query_params["user_id"]):
                 return Response(data="Account Id does not exists for the user",status=status.HTTP_403_FORBIDDEN)
             account_details.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -106,7 +106,7 @@ class Sample(ViewSet):
         try:
             account_details = Account.objects.get(pk=account_uid)
             new_data = request.data
-            if account_details.user != query_params["user_id"]:
+            if account_details.user != int(query_params["user_id"]):
                 return Response(data="Account Id does not exists for the user",status=status.HTTP_403_FORBIDDEN)
             #User might only provide data which is required to modify, hence partial is accepted
             serializer = self.serializer_class(data=new_data, partial=True)
