@@ -82,3 +82,28 @@ add the myapp in the settings.py of myproject
 create an urls.py file in your myapp
 include(direct) the urls.py of your myproject to the myapp
 migrate the models = python manage.py migrate
+
+Plan:
+
+1) Each user have multiple accs. (Done)
+2) Once user logins, they get jwt token, after which they will make API calls with token. (Done)
+3) The jwt token will validate, whether the request is coming from authorized user (Done)
+(By checking whether the user_id in jwt token matches the user_id in query params)
+4) Once usr is authorized, they can upload their summary file info to get financial info (In Progress)
+4a) The API endpoint should validate the user_id passed in request. (Done)
+4b) The API endpoint should validate the account_id and other personal info passed in file wrt user id (Done)
+4c) The API will also accept set of questions in request in array format
+4d) Once validated, the user info such as loan,emi,income should be retrieved and sent to OpenAI (User_info + set of questions) to retrieve ans.
+4e) Answers should be formatted in appropriate format, and response should be returned to user
+
+example:
+
+What is my estimated cibil score: 700
+credit card utilization ratio: 38 %
+My total more years in debt: 3 years
+Debt to Income ratio: 44 %
+More maximum loan which can be approved range: 3L-15L
+Risk Flags (If any): EMI burden above 30% , High single debit amount
+Any more suggestions: Reduce credit utilization to <30% of card limit, Consider closing smaller loans faster.
+
+NOTE: This is user critical PII info, should not be stored anywhere in db or something. Just for processing only.
