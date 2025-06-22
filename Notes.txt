@@ -75,7 +75,6 @@ But cannot modify it to create a token for another payload, because even if anot
 with other payload, the signature will be different and back end will catch that saying
 "Signature not match for the payload"(because that payload was assoc with other secret key which is not known)
 
-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
 
 Create django project = django-admin startproject myproject
 Create django app = python manage.py startapp myapp
