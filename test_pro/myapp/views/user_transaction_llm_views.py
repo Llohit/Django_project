@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from pypdf import PdfReader
 import re
+from openai import OpenAI
+client = OpenAI()
 
 class FinancialInfoView(APIView):
     allowed_headers = {'Personal Info':{'Account ID','User Name','Age','Gender'},
@@ -15,9 +17,76 @@ class FinancialInfoView(APIView):
                        'Expenditure (Monthly)': {'EMI', 'Average Credit Card Spend (last 3 months)','Other Monthly Average spendings'},
                        'Bank Credit Information': {'Maximum Single Credit Amount', 'Maximum Single Debit Amount'}}
 
+
+    def ask_ai(self,financial_info: str, user_questions: list):
+        """
+        financial_info: Financial details of the users.
+        user_questions: List of user questions.
+        return: dictionary of key(question): value(answer)
+        """
+
+        formatted_questions = "\n".join([f"{i + 1}. {q}" for i, q in enumerate(user_questions)])
+
+        prompt_template = f"""
+        You are a financial analyst AI assistant.
+
+        Below is the structured financial data of a user in JSON format:
+
+        {financial_info}
+
+        Please answer the following questions:
+
+        {formatted_questions}
+
+        Instructions:
+        -------------
+        - Use only the above data to answer the questions.
+        - Clearly label each answer with the question number.
+        - If any assumptions or estimations are made, clearly state them.
+        - If any data is missing, reply with 'Information not available.'
+        """
+
+        print(prompt_template)
+
+        response = client.responses.create(
+            model="gpt-4o-mini",
+            input=[
+                {"role": "developer",
+                 "content": f"If you don't have any answer to question, just say...Information not available"},
+                {
+                    "role": "user",
+                    "content": prompt_template
+                }
+            ]
+        )
+
+        print(response)
+        return
+
+    def parse_user_questions(self,questions_str):
+        """
+        Convert a string like "[What is the name?,How are you?,Are you okay?]"
+        into a list of question strings.
+        """
+        if not questions_str:
+            return []
+
+        # Remove brackets if present
+        questions_str = questions_str.strip()
+
+        # Use regex to split by commas that are outside of quotes (if quotes were used)
+        if questions_str.startswith('[') and questions_str.endswith(']'):
+            questions_str = questions_str[1:-1]
+
+        # Split on commas, strip whitespace from each question
+        questions = [q.strip() for q in questions_str.split(',') if q.strip()]
+
+        return questions
+
     def clean_value(self,value):
         """Clean ₹ symbols, commas, and whitespace."""
         return re.sub(r'[₹,]', '', value).strip()
+
 
     def text_to_map(self,text):
         result = {}
@@ -56,7 +125,7 @@ class FinancialInfoView(APIView):
         user_id = int(user_id)
         user_financial_info_pdf = request.FILES.get('file')
         pdf_reader = PdfReader(user_financial_info_pdf)
-        user_questions = request.data.get('text')
+        user_questions = self.parse_user_questions(request.data.get('questions'))
         full_text = ""
 
         #Read all the contents of pdf in string
@@ -68,8 +137,8 @@ class FinancialInfoView(APIView):
 
         #Some validation to ensure only authorized user is giving the account details
         compulsory_personal_info = self.allowed_headers['Personal Info'].copy()
-        compulsory_personal_info.pop('Age')
-        compulsory_personal_info.pop('Gender')
+        compulsory_personal_info.remove('Age')
+        compulsory_personal_info.remove('Gender')
         if 'Personal Info' not in user_financial_info:
             return Response(f"Personal Info is required in the file with information {compulsory_personal_info}", status=status.HTTP_403_FORBIDDEN)
         user_personal_info = user_financial_info.pop('Personal Info')
@@ -90,7 +159,11 @@ class FinancialInfoView(APIView):
             return Response("Incorrect User Name passed in the file", status=status.HTTP_403_FORBIDDEN)
 
         print(user_financial_info)
+        print(user_questions)
 
         #Convert dictionary mapping to json format, as AI will understand json format
         user_financial_info_json = json.dumps(user_financial_info,indent=2)
+
+        self.ask_ai(financial_info=user_financial_info_json, user_questions=user_questions)
+
         return
