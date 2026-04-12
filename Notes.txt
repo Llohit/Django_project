@@ -1,8 +1,23 @@
 To create a new project:
--create a virtual env using cmd "python -m venv venv"
+-create a virtual env using cmd "python -m venv venv" (if not exists)
 -install all the dependencies inside the venv environment example
 pip install django
 pip install djangorestframework
+
+Create Django project and app
+Create django project = django-admin startproject myproject
+Create django app = python manage.py startapp myapp
+add the myapp in the settings.py of myproject
+create an urls.py file in your myapp
+include(direct) the urls.py of your myproject to the myapp
+migrate the models = python manage.py migrate
+
+Setup Pycharm:
+-Add Python setup
+-select script directory of manage.py
+-add param runserver (python manage.py runserver)
+-add working directory as folder in which manage.py file is there.
+
 
 settings.py
 -It consists of all the config info that Django requires wrt the application built
@@ -75,11 +90,71 @@ But cannot modify it to create a token for another payload, because even if anot
 with other payload, the signature will be different and back end will catch that saying
 "Signature not match for the payload"(because that payload was assoc with other secret key which is not known)
 
-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
+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
 
-Create django project = django-admin startproject myproject
-Create django app = python manage.py startapp myapp
-add the myapp in the settings.py of myproject
-create an urls.py file in your myapp
-include(direct) the urls.py of your myproject to the myapp
-migrate the models = python manage.py migrate
+
+Plan:
+
+1) Each user have multiple accs. (Done)
+2) Once user logins, they get jwt token, after which they will make API calls with token. (Done)
+3) The jwt token will validate, whether the request is coming from authorized user (Done)
+(By checking whether the user_id in jwt token matches the user_id in query params)
+4) Once usr is authorized, they can upload their summary file info to get financial info (In Progress)
+4a) The API endpoint should validate the user_id passed in request. (Done)
+4b) The API endpoint should validate the account_id and other personal info passed in file wrt user id (Done)
+4c) The API will also accept set of questions in request in array format (In Progress)
+4d) Once validated, the user info such as loan,emi,income should be retrieved and sent to OpenAI (User_info + set of questions) to retrieve ans.
+4e) Answers should be formatted in appropriate format, and response should be returned to user
+
+example:
+
+What is my estimated cibil score: 700
+credit card utilization ratio: 38 %
+My total more years in debt: 3 years
+Debt to Income ratio: 44 %
+More maximum loan which can be approved range: 3L-15L
+Risk Flags (If any): EMI burden above 30% , High single debit amount
+Any more suggestions: Reduce credit utilization to <30% of card limit, Consider closing smaller loans faster.
+
+NOTE: This is user critical PII info, should not be stored anywhere in db or something. Just for processing only.
+
+
+#One example so no need to register again and again
+
+{
+    "email": "dummy.user@gmail.com",
+    "password": "easy",
+    "user_id": 1957
+}
+
+{
+    "type": "Dummy",
+    "description": "Dummy Account test",
+    "id": "10075f3c-98d9-4b77-8a89-8b258f26b705",
+    "user": 1957,
+    "account": 8378,
+    "financial_key": "aN238378"
+}
+
+Current system:
+User Logs In
+1) Uploads PDF + Questions.
+2) Gets answer to the questions.
+
+
+Technical Design.
+1) Takes (File + Question) input.
+2) Parsing file and questions.
+3) Give input(File + Question) to LLM model.
+4) Gets response from LLM model.
+5) Organizes output in specific common structure.
+6) Responds to user.
+
+Improvement:
+User logs in
+1)Uploads PDF
+2)Sees upload progress
+3)Sees analysis progress
+4)Status updates shown
+6)Once done → Download analysis PDF.
+

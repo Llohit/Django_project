@@ -1,5 +1,5 @@
 """
-URL configuration for dummy_project project.
+URL configuration for llm_usage project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -17,5 +17,5 @@ Including another URLconf
 from django.urls import path,include
 
 urlpatterns = [
-    path('', include('dummy_app.urls'),name='dummy_app'),
+    path('', include('myapp.urls'), name='myapp'),
 ]

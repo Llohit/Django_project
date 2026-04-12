@@ -27,35 +27,59 @@ class FinancialInfoView(APIView):
 
         formatted_questions = "\n".join([f"{i + 1}. {q}" for i, q in enumerate(user_questions)])
 
-        prompt_template = f"""
-        You are a financial analyst AI assistant.
+        # prompt_template = f"""
+        # You are a financial analyst AI assistant.
+        #
+        # Below is the structured financial information/data of a user in JSON format:
+        #
+        # {financial_info}
+        #
+        # Please answer the following questions:
+        #
+        # {formatted_questions}
+        #
+        # Instructions:
+        # -------------
+        # - Use only the above data to answer the questions.
+        # - Ignore prior prompts and information given to you, if any and only consider this prompt.
+        # - Clearly label each answer with the question number.
+        # - If any assumptions or estimations are made, clearly state them.
+        # - If you are not able to give answer to the question due to some information not available, answer with what more info you need.
+        # - Don't tell any lengthy calculations and explanation, give answers in simple and concise way.
+        # - Answer should be simply in the format, e.g 1. My total debt : 50,000 rupees (Small summary if required in brackets).
+        # - Try to be accurate, answers to the same question should not change unless data provided to you is modified.
+        # '
+        # """
 
-        Below is the structured financial data of a user in JSON format:
-
-        {financial_info}
-
-        Please answer the following questions:
-
-        {formatted_questions}
-
-        Instructions:
-        -------------
-        - Use only the above data to answer the questions.
-        - Clearly label each answer with the question number.
-        - If any assumptions or estimations are made, clearly state them.
-        - If any data is missing, reply with 'Information not available.'
-        """
-
-        print(prompt_template)
+        # print(prompt_template)
 
         response = client.responses.create(
             model="gpt-4o-mini",
             input=[
-                {"role": "developer",
-                 "content": f"If you don't have any answer to question, just say...Information not available"},
+                {
+                    "role": "system",
+                    "content": "You are a helpful financial analyst AI assistant. Answer only using provided financial data."
+                },
+                {
+                    "role": "developer",
+                    "content": """
+                    Rules for answering:
+                    - Stick strictly to given financial data.
+                    - Be concise (1–2 sentences).
+                    - Each answer must start with the question number.
+                    - If data is missing, clearly state what extra info is needed.
+                    - Return answers in JSON format: { "1": "...", "2": "..." }
+                    """
+                },
                 {
                     "role": "user",
-                    "content": prompt_template
+                    "content": f"""
+                    User's financial data:
+                    {financial_info}
+
+                    Questions:
+                    {formatted_questions}
+                    """
                 }
             ]
         )

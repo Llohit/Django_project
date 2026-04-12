@@ -1,4 +1,4 @@
-#!/home/epooloh/Desktop/Django_project/dummy_project/venv/bin/python
+#!/home/epooloh/Desktop/Django_project/llm_usage/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
