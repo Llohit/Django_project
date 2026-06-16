@@ -155,3 +155,17 @@ User logs in
 4)Status updates shown
 6)Once done → Download analysis PDF.
 
+Technical backend data flow:
+1) API (with pdf) -> Authorization -> PDF validations -> Input Accepted -> Processing (background) -> Response (acceptance status + track_id)
+2) If validation is failed due to some reason, return denial status with reason.
+3) At an API level, once the input is accepted after validation, an track_id will be genarated for the request.
+4) Track ID will be associated to the request which will have it's own progress state.
+    a) e.g track_id: 100, state: llm_analysis_in_progress, user_id: 289.
+5) The status for an particular track_id will be updated by the background process accordingly.
+6) User can make an API call to check the status of their track_id.
+    a) API -> Fetch track_id info from DB -> response (track_id: 100, state: llm_analysis_in_progress, user_id: 289).
+7) Once the analysis is complete the background processing will store the pdf file at S3 (for prod) / local (for testing).
+8) Once the pdf is stored the state -> COMPLETED and in the response of the API to track user will get url link.
+    a) API -> Fetch track_id info from DB -> response (track_id: 100, state: analysis_completed, user_id: 289, download_url: "http://localhost:8000/media/reports/sample.pdf").
+9) In the pdf file user should be able to see financial analysis.
+
